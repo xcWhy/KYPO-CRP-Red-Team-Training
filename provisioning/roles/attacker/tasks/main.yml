@@ -1,0 +1,13 @@
+- name: Add the user 'Sandy' with a bash shell to the user's groups
+  user:
+      name: Sandy
+      password: "{{ 'sandypass' | password_hash('sha512') }}"
+      create_home: yes
+      shell: /bin/bash
+
+
+- name: Adding aliases
+  loop: "{{ aliases | dict2items }}"
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item.value }} {{ item.key }}"

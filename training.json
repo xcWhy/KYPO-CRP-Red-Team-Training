@@ -1,0 +1,177 @@
+{
+  "title" : "Red Team",
+  "description" : "This training will teach you how attackers use reconnaissance, weak configurations, and privilege escalation to compromise systems!",
+  "prerequisites" : [ ],
+  "outcomes" : [ "Reconnaissance" ],
+  "state" : "UNRELEASED",
+  "show_stepper_bar" : true,
+  "levels" : [ {
+    "title" : "Introduction level",
+    "level_type" : "INFO_LEVEL",
+    "order" : 0,
+    "estimated_duration" : 0,
+    "minimal_possible_solve_time" : null,
+    "content" : "# Welcome!\n### This training will teach you how attackers use reconnaissance, weak configurations, and privilege escalation to compromise systems! \n\n### Let's get into the story -\n### You and your friends are а fans of a series which aired last week. But recently, your friend Ivan ruined the fun by spoiling the finale before you even had the chance to watch it! >:(\n### He runs a server where he stores his collection of movies and series, and you've decided to get some friendly revenge by limiting his access to the server. Let's teach Ivan a lesson about cybersecurity while having a little fun. :)\n\n"
+  }, {
+    "title" : "Get Access",
+    "level_type" : "ACCESS_LEVEL",
+    "order" : 1,
+    "estimated_duration" : 0,
+    "minimal_possible_solve_time" : null,
+    "passkey" : "start",
+    "cloud_content" : "# Firstly, let's access the Kali Linux machine we will be using for the training!\n## 1. On your right, there should appear a window with a topology, showing available machines and networks.\n - ### You will have access only to the **attacker** machine (if you don't see the machine right away, try clicking on the switches and the machine should appear)\n - ### In order to access the **attacker** machine, you will need to **right click** it select the option **console (deprecated)** - this will open a tab with the starting machine of a Kali Linux.\n - ### Your login credentials for the **attacker** machine are: **Sandy** and with password **sandypass**.\n\n## 2. When you login in the **attacker** machine, you should be able to open the terminal.\n - ### When you are ready with all of that - type in **start** in the box below to continue with the training! :)\n",
+    "local_content" : "."
+  }, {
+    "title" : "Initial Reconnaissance",
+    "level_type" : "TRAINING_LEVEL",
+    "order" : 2,
+    "estimated_duration" : 5,
+    "minimal_possible_solve_time" : null,
+    "answer" : "nmap -sV 10.1.26.9",
+    "answer_variable_name" : null,
+    "content" : "### You overheard Ivan bragging about how ***secure*** his server is. But you overheard him casually mention his server's IP address: **10.1.26.9**. Using basic tools, you decide to run a network scan to uncover the services he's left open. \n### The first step in any good prank is **reconnaissance**!\n\n### Your objective is:\n- #### to use a tool for port scanning\n- #### to use a specific argument to show the running services on a machine \n- #### to execute a the full command on Ivan's server\n\n### **Type in the full command in the answer box!**",
+    "solution" : "This command will show us all running services and some info about them on Ivan's server:\n\n``nmap -sV 10.1.26.9``   <- the answer",
+    "solution_penalized" : true,
+    "hints" : [ {
+      "title" : "Arguments",
+      "content" : "#### The argument **-sV** will show the running services on the machine, with additional info about them. :)",
+      "hint_penalty" : 1,
+      "order" : 1
+    }, {
+      "title" : "The tool",
+      "content" : "#### Ivan thinks his server is super secure, but maybe he left a door open. :))\n#### Use **nmap** to find out!",
+      "hint_penalty" : 1,
+      "order" : 0
+    } ],
+    "incorrect_answer_limit" : 10,
+    "attachments" : [ ],
+    "max_score" : 10,
+    "variant_answers" : false,
+    "reference_solution" : [ ],
+    "mitre_techniques" : [ ],
+    "expected_commands" : [ ],
+    "commands_required" : false
+  }, {
+    "title" : "Gaining Access",
+    "level_type" : "TRAINING_LEVEL",
+    "order" : 3,
+    "estimated_duration" : 5,
+    "minimal_possible_solve_time" : null,
+    "answer" : "backup.txt",
+    "answer_variable_name" : null,
+    "content" : "### By running **nmap** we discover an open FTP port (21) on the server. *Interesting...* \n### The File Transfer Protocol (FTP) is a standard communication protocol - used for the transfer of computer files from a server to a client on a computer network. ;)\n\n### Since Ivan isn't the kind of guy to read about vulnerabilities in protocols, let's see whether he has left his FTP server open to **anonymous** logins. :))\n\n### **Your objective:**\n \n- #### try logging in in Ivan's FTP server\n\n- #### look for some files he may have stored in it\n \n### The flag is to type **the full name** of **the most interesting** looking file in the FTP server ;)\n(with suffix)",
+    "solution" : "`` ftp 10.1.26.9 ``\n\nUsername: anonymous  \nPassword: <leave blank>\n\n`` ls ``\n\n`` backup.txt `` <- the answer",
+    "solution_penalized" : true,
+    "hints" : [ {
+      "title" : "Logging in",
+      "content" : "#### There's a chance that Ivan has left his FTP server open to anonymous logins.\n#### Try connecting with the command **ftp 10.1.26.9** :)",
+      "hint_penalty" : 2,
+      "order" : 0
+    }, {
+      "title" : "Listing files",
+      "content" : "#### With the simple command **ls** we can list all stored files in the FTP server. :)",
+      "hint_penalty" : 1,
+      "order" : 2
+    }, {
+      "title" : "Logging in 2",
+      "content" : "#### When using the command to login in the FTP server we are prompted to input credentials.\n#### Let's try with the username **anonymous** and leaving the password blank ;)",
+      "hint_penalty" : 1,
+      "order" : 1
+    } ],
+    "incorrect_answer_limit" : 10,
+    "attachments" : [ ],
+    "max_score" : 10,
+    "variant_answers" : false,
+    "reference_solution" : [ ],
+    "mitre_techniques" : [ ],
+    "expected_commands" : [ ],
+    "commands_required" : true
+  }, {
+    "title" : "SSH Login",
+    "level_type" : "TRAINING_LEVEL",
+    "order" : 4,
+    "estimated_duration" : 5,
+    "minimal_possible_solve_time" : null,
+    "answer" : "ssh ivan@10.1.26.9",
+    "answer_variable_name" : null,
+    "content" : "### We found an interesting file in Ivan's server - **backup.txt**!\n### But in order to open it and see what's inside, we will need to **transfer the file to our machine**.\n\n### After transferring the file to us we notice that the contents of **backup.txt** are looking like a user's credentials for Ivan's server! ;)\n\n### Let's try logging in as this user in Ivan's server and continue our revenge.\n\n### Your objective is:\n- #### transfer the file **backup.txt** to your Kali machine\n- #### see the contents of the file\n- #### use the contents to ssh to Ivan's machine\n\n\n ### The flag is the ssh command for getting in Ivan's server.",
+    "solution" : "`get backup.txt`\n`exit`\n\n`cat backup.txt`\n\n`ssh ivan@10.1.26.9` <- the solution\n\n`password: iluvfilms`",
+    "solution_penalized" : true,
+    "hints" : [ {
+      "title" : "Logging in 2",
+      "content" : "#### We have a user's credentials for Ivan's server.\n\n#### With the command **ssh >user@>ip** we can try logging in Ivan's server. ",
+      "hint_penalty" : 2,
+      "order" : 2
+    }, {
+      "title" : "Transferring files",
+      "content" : "#### In an FTP server we are able to transfer computer files from the server to our machine.\n#### With the command **get <file>** we can do just that!",
+      "hint_penalty" : 2,
+      "order" : 0
+    }, {
+      "title" : "Logging in",
+      "content" : "#### In order to login in Ivan's server we will need to see the contents of backup.txt.\n#### In Linux the command **cat** will display the contents of a file.",
+      "hint_penalty" : 1,
+      "order" : 1
+    } ],
+    "incorrect_answer_limit" : 10,
+    "attachments" : [ ],
+    "max_score" : 10,
+    "variant_answers" : false,
+    "reference_solution" : [ ],
+    "mitre_techniques" : [ ],
+    "expected_commands" : [ ],
+    "commands_required" : true
+  }, {
+    "title" : "Disabling Access",
+    "level_type" : "TRAINING_LEVEL",
+    "order" : 5,
+    "estimated_duration" : 3,
+    "minimal_possible_solve_time" : null,
+    "answer" : "sudo passwd",
+    "answer_variable_name" : null,
+    "content" : "## You're in!\n### It looks like the user **ivan** has root privileges. ;)\n### Now, it's time to remove his ability to log into the server entirely!\n### He'll be locked out until he fixes his configurations. >:)\n\n### This means your objective will be:\n- #### to change Ivan's server password\n\n### The solution to your revenge is the **privileged command** for changing Ivan's server password.\n",
+    "solution" : "`sudo passwd` <- the solution\n\nEnter new password: <new pass>",
+    "solution_penalized" : true,
+    "hints" : [ {
+      "title" : "Privileged Access",
+      "content" : "#### When we say **privileged access** it means the command should start with **sudo**",
+      "hint_penalty" : 1,
+      "order" : 1
+    }, {
+      "title" : "Changing password",
+      "content" : "#### In Linux, to change a user's password we use the command **passwd**.",
+      "hint_penalty" : 2,
+      "order" : 0
+    } ],
+    "incorrect_answer_limit" : 10,
+    "attachments" : [ ],
+    "max_score" : 10,
+    "variant_answers" : false,
+    "reference_solution" : [ ],
+    "mitre_techniques" : [ ],
+    "expected_commands" : [ ],
+    "commands_required" : true
+  }, {
+    "title" : "Good job!",
+    "level_type" : "TRAINING_LEVEL",
+    "order" : 6,
+    "estimated_duration" : 1,
+    "minimal_possible_solve_time" : null,
+    "answer" : "good job",
+    "answer_variable_name" : null,
+    "content" : "## Ivan is now locked out of his server and your revenge is complete! :) \n### Of course, he'll need to call you for help, and that's when you'll reveal the prank and teach him the importance of securing his system! :D\n\n#### I hope this challenge has taught you how attackers use reconnaissance, weak configurations, and privilege escalation to compromise systems. While you've used these skills for a playful prank, remember that in the real world, such vulnerabilities can lead to serious consequences. Always secure your systems and respect ethical guidelines! :)\n\n### flag: **good job**",
+    "solution" : "good job\n:)",
+    "solution_penalized" : true,
+    "hints" : [ ],
+    "incorrect_answer_limit" : 10,
+    "attachments" : [ ],
+    "max_score" : 1,
+    "variant_answers" : false,
+    "reference_solution" : [ ],
+    "mitre_techniques" : [ ],
+    "expected_commands" : [ ],
+    "commands_required" : true
+  } ],
+  "estimated_duration" : 19,
+  "variant_sandboxes" : false
+}

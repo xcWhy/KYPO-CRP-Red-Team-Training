@@ -1,0 +1,9 @@
+aliases:
+  server: 10.1.26.9
+routings: []
+
+ftp_user: ftpuser
+ftp_password: ftp_password123
+
+flag_file: /var/ftp/backup.txt
+flag_file_2: /var/ftp/CatWars3.mov

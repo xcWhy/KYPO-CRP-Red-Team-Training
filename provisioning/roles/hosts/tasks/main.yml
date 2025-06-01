@@ -1,0 +1,41 @@
+---
+# Basic configuration of all host devices
+
+- name: Install net-tools
+  apt:
+    name: net-tools
+
+- name: Install unzip
+  apt:
+    name: unzip
+
+- name: Fix DNS config
+  copy:
+    dest: /etc/resolv.conf
+    content: |
+      nameserver 8.8.8.8
+      nameserver 1.1.1.1
+
+- name: Retry apt update with fixed DNS
+  apt:
+    update_cache: yes
+  register: apt_result
+  retries: 5
+  delay: 5
+  until: apt_result is success
+
+- name: Ensure dnsutils is installed (for nslookup)
+  apt:
+    name: dnsutils
+    state: present
+    update_cache: yes
+
+- name: DNS check using getent
+  command: getent hosts archive.ubuntu.com
+  register: dns_check
+  ignore_errors: true
+
+- name: Fail if DNS resolution fails
+  fail:
+    msg: "DNS resolution is not working"
+  when: dns_check.rc != 0

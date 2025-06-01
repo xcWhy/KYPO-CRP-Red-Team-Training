@@ -1,0 +1,104 @@
+- name: Add the user 'ivan' with a bash shell to the user's groups
+  user:
+      name: ivan
+      password: "{{ 'iluvfilms' | password_hash('sha512') }}"
+      create_home: yes
+      shell: /bin/bash
+
+- name: Ensure ivan user can execute sudo commands without a password
+  copy:
+    content: |
+      ivan ALL=(ALL) NOPASSWD:ALL
+    dest: /etc/sudoers.d/ivan
+    owner: root
+    group: root
+    mode: '0440'
+
+- name: Adding aliases
+  loop: "{{ aliases | dict2items }}"
+  lineinfile:
+      path: /etc/hosts
+      line: "{{ item.value }} {{ item.key }}"
+
+###
+
+- name: Install required packages
+  apt:
+    name: 
+      - vsftpd
+      - openssh-server
+    state: present
+    update_cache: yes
+
+- name: Ensure /etc/vsftpd directory exists
+  file:
+    path: /etc/vsftpd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create FTP user
+  user:
+    name: "{{ ftp_user }}"
+    password: "{{ ftp_password | password_hash('sha512') }}"
+    shell: /usr/sbin/nologin
+    home: /var/ftp
+    state: present
+
+- name: Ensure FTP user's home directory exists
+  file:
+    path: /var/ftp
+    state: directory
+    owner: "{{ ftp_user }}"
+    group: "{{ ftp_user }}"
+    mode: '0755'
+
+- name: Create sensitive file in FTP directory
+  copy:
+    src: backup.txt
+    dest: "{{ flag_file }}"
+    owner: "{{ ftp_user }}"
+    group: "{{ ftp_user }}"
+    mode: '0644'
+
+- name: Import CatWars3 movie
+  copy:
+    src: CatWars3.mov
+    dest: "{{ flag_file_2 }}"
+    owner: "{{ ftp_user }}"
+    group: "{{ ftp_user }}"
+    mode: '0644'
+
+###
+- name: Enable insecure FTP settings
+  lineinfile:
+    path: /etc/vsftpd.conf
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "local_enable=YES"
+    - "write_enable=YES"
+    - "anon_root=/var/ftp"
+    - "anonymous_enable=YES"
+  notify:
+    - Restart FTP
+  tags:
+        - ftp
+###
+
+- name: Configure SSH server to allow root login
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin'
+    line: 'PermitRootLogin yes'
+    state: present
+  notify: Restart SSH
+
+- name: Restart services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - vsftpd
+    - ssh
